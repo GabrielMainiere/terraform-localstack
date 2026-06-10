@@ -1,0 +1,25 @@
+services:
+  localstack:
+    image: localstack/localstack:3.8
+    container_name: localstack
+    ports:
+      - "4566:4566"
+      - "4510-4559:4510-4559"
+    environment:
+      - SERVICES=ec2, rds, apigateway, apigatewayv2
+      - DEFAULT_REGION=us-east-1
+      - AWS_DEFAULT_REGION=us-east-1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bash",
+          "-c",
+          'curl -sf http://localhost:4566/_localstack/health | grep -q ''"ec2"''',
+        ]
+      interval: 5s
+      timeout: 10s
+      retries: 20
+      start_period: 10s
