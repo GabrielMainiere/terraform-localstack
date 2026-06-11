@@ -32,9 +32,9 @@ services:
       - POSTGRES_PASSWORD=admin
       - POSTGRES_DB=terraform_db
     ports:
-      - "5432:5432"
+      - "5433:5432"
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "admin"]
+      test: ["CMD", "pg_isready", "-U", "admin", "-d", "terraform_db"]
       interval: 5s
       timeout: 10s
       retries: 5
