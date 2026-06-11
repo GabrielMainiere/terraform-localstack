@@ -1,0 +1,46 @@
+- name: Configurar e subir API JS
+  hosts: api
+  gather_facts: false
+
+  vars:
+    app_dir: /tmp/api
+
+  tasks:
+    - name: Criar diretorio da aplicacao
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+
+    - name: Copiar arquivos da API
+      copy:
+        src: "../api-js/{{ item }}"
+        dest: "{{ app_dir }}/"
+      loop:
+        - .env
+        - database.js
+        - index.js
+        - modelIndex.js
+        - package.json
+        - router.js
+        - seed.js
+
+    - name: Instalar dependencias npm
+      command:
+        cmd: npm install
+        chdir: "{{ app_dir }}"
+
+    - name: Executar seed da API
+      command:
+        cmd: npm run seed
+        chdir: "{{ app_dir }}"
+
+    - name: Iniciar API em background
+      shell:
+        cmd: "nohup npm start >> api.log 2>&1 &"
+        chdir: "{{ app_dir }}"
+
+    - name: Aguardar API iniciar
+      wait_for:
+        port: 3000
+        delay: 2
+        timeout: 30
